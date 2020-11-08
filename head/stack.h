@@ -6,10 +6,11 @@
 typedef struct stack_node
 {
     data_type *data;
+    size_t data_size;
     struct stack_node *last;
 } stack_node;
 
-stack_node *init_stack_node(data_type *data, stack_node *last);
+stack_node *init_stack_node(data_type *data, size_t data_size, stack_node *last);
 
 void destory_stack_node(stack_node **node_ptr);
 
@@ -23,9 +24,9 @@ stack *init_stack();
 
 int stack_is_empty(stack *st);
 
-void stack_push(stack *st, data_type *data);
+void stack_push(stack *st, data_type *data, size_t data_size);
 
-data_type *stack_pop(stack *st);
+void stack_pop(stack *st);
 
 data_type *stack_get_peek(stack *st);
 

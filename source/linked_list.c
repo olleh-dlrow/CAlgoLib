@@ -7,11 +7,17 @@
  * linked_list_node
 */
 linked_list_node *init_linked_list_node(data_type *data,
+                                        size_t data_size,
                                         linked_list_node *next,
                                         linked_list_node *last)
 {
     linked_list_node *node = (linked_list_node *)malloc(sizeof(linked_list_node));
-    node->data = data;
+    node->data = (data_type *)malloc(data_size);
+    char *bytes = (char *)data;
+    for (size_t i = 0; i < data_size; i++)
+    {
+        *(char *)(node->data + i) = bytes[i];
+    }
     node->next = next;
     node->last = last;
     return node;
@@ -19,7 +25,9 @@ linked_list_node *init_linked_list_node(data_type *data,
 
 void destory_linked_list_node(linked_list_node **node_ptr)
 {
-    free(*node_ptr);
+    linked_list_node *node = *node_ptr;
+    free(node->data);
+    free(node);
     *node_ptr = NULL;
     return;
 }
@@ -30,8 +38,8 @@ void destory_linked_list_node(linked_list_node **node_ptr)
 linked_list *init_linked_list()
 {
     linked_list *ls = (linked_list *)malloc(sizeof(linked_list));
-    ls->head = init_linked_list_node(NULL, NULL, NULL);
-    ls->tail = init_linked_list_node(NULL, ls->head, ls->head);
+    ls->head = init_linked_list_node(NULL, 0, NULL, NULL);
+    ls->tail = init_linked_list_node(NULL, 0, ls->head, ls->head);
     ls->head->next = ls->tail;
     ls->head->last = ls->tail;
     ls->length = 0;
@@ -43,7 +51,7 @@ int linked_list_is_empty(linked_list *ls)
     return ls->length == 0;
 }
 
-void linked_list_insert(linked_list *ls, data_type *data, int index)
+void linked_list_insert(linked_list *ls, data_type *data, size_t data_size, int index)
 {
     if (index < 0)
     {
@@ -65,7 +73,7 @@ void linked_list_insert(linked_list *ls, data_type *data, int index)
     //p pointers to the pre node of inserting node
     linked_list_node *post = p->next;
     //new node
-    linked_list_node *node = init_linked_list_node(data, post, p);
+    linked_list_node *node = init_linked_list_node(data, data_size, post, p);
     p->next = node;
     post->last = node;
     //length++
@@ -73,9 +81,9 @@ void linked_list_insert(linked_list *ls, data_type *data, int index)
     return;
 }
 
-void linked_list_push_back(linked_list *ls, data_type *data)
+void linked_list_push_back(linked_list *ls, data_type *data, size_t data_size)
 {
-    linked_list_insert(ls, data, ls->length);
+    linked_list_insert(ls, data, data_size, ls->length);
 }
 
 void linked_list_delete(linked_list *ls, int index)

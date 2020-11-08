@@ -6,17 +6,24 @@
  * stack_node
 */
 
-stack_node *init_stack_node(data_type *data, stack_node *last)
+stack_node *init_stack_node(data_type *data, size_t data_size, stack_node *last)
 {
     stack_node *sn = (stack_node *)malloc(sizeof(stack_node));
-    sn->data = data;
+    sn->data = (data_type *)malloc(data_size);
+    char *bytes = (char *)data;
+    for (size_t i = 0; i < data_size; i++)
+    {
+        *(char *)(sn->data + i) = bytes[i];
+    }
     sn->last = last;
     return sn;
 }
 
 void destory_stack_node(stack_node **node_ptr)
 {
-    free(*node_ptr);
+    stack_node *node = *node_ptr;
+    free(node->data);
+    free(node);
     *node_ptr = NULL;
 }
 
@@ -27,7 +34,7 @@ void destory_stack_node(stack_node **node_ptr)
 stack *init_stack()
 {
     stack *st = (stack *)malloc(sizeof(stack));
-    st->head = init_stack_node(NULL, NULL);
+    st->head = init_stack_node(NULL, 0, NULL);
     st->top = st->head;
     return st;
 }
@@ -37,14 +44,14 @@ int stack_is_empty(stack *st)
     return st->head == st->top;
 }
 
-void stack_push(stack *st, data_type *data)
+void stack_push(stack *st, data_type *data, size_t data_size)
 {
-    stack_node *node = init_stack_node(data, st->top);
+    stack_node *node = init_stack_node(data, data_size, st->top);
     st->top = node;
     return;
 }
 
-data_type *stack_pop(stack *st)
+void stack_pop(stack *st)
 {
     if (stack_is_empty(st))
     {
@@ -54,7 +61,7 @@ data_type *stack_pop(stack *st)
     stack_node *tmp = st->top;
     st->top = st->top->last;
     destory_stack_node(&tmp);
-    return tmp->data;
+    return;
 }
 
 data_type *stack_get_peek(stack *st)
