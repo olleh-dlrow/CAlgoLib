@@ -18,6 +18,7 @@ typedef struct stack
 {
     stack_node *top;
     stack_node *head;
+    int length;
 } stack;
 
 stack *init_stack();
@@ -29,6 +30,8 @@ void stack_push(stack *st, data_type *data, size_t data_size);
 void stack_pop(stack *st);
 
 data_type *stack_get_peek(stack *st);
+
+int stack_get_length(stack *st);
 
 void destory_stack(stack **st_ptr);
 

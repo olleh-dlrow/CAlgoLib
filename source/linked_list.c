@@ -12,12 +12,14 @@ linked_list_node *init_linked_list_node(data_type *data,
                                         linked_list_node *last)
 {
     linked_list_node *node = (linked_list_node *)malloc(sizeof(linked_list_node));
+    //node->data = data
     node->data = (data_type *)malloc(data_size);
     char *bytes = (char *)data;
     for (size_t i = 0; i < data_size; i++)
     {
         *(char *)(node->data + i) = bytes[i];
     }
+    //
     node->next = next;
     node->last = last;
     return node;

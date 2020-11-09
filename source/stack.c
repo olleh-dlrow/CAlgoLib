@@ -36,18 +36,20 @@ stack *init_stack()
     stack *st = (stack *)malloc(sizeof(stack));
     st->head = init_stack_node(NULL, 0, NULL);
     st->top = st->head;
+    st->length = 0;
     return st;
 }
 
 int stack_is_empty(stack *st)
 {
-    return st->head == st->top;
+    return st->length == 0;
 }
 
 void stack_push(stack *st, data_type *data, size_t data_size)
 {
     stack_node *node = init_stack_node(data, data_size, st->top);
     st->top = node;
+    st->length++;
     return;
 }
 
@@ -61,12 +63,18 @@ void stack_pop(stack *st)
     stack_node *tmp = st->top;
     st->top = st->top->last;
     destory_stack_node(&tmp);
+    st->length--;
     return;
 }
 
 data_type *stack_get_peek(stack *st)
 {
     return st->top->data;
+}
+
+int stack_get_length(stack *st)
+{
+    return st->length;
 }
 
 void destory_stack(stack **st_ptr)
