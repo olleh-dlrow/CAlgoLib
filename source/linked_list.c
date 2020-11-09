@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "linked_list.h"
 
 /**
@@ -14,11 +11,7 @@ linked_list_node *init_linked_list_node(data_type *data,
     linked_list_node *node = (linked_list_node *)malloc(sizeof(linked_list_node));
     //node->data = data
     node->data = (data_type *)malloc(data_size);
-    char *bytes = (char *)data;
-    for (size_t i = 0; i < data_size; i++)
-    {
-        *(char *)(node->data + i) = bytes[i];
-    }
+    shift_data(data, node->data, data_size);
     //
     node->next = next;
     node->last = last;
@@ -37,7 +30,7 @@ void destory_linked_list_node(linked_list_node **node_ptr)
 /**
  * linked_list
 */
-linked_list *init_linked_list()
+linked_list *init_linked_list(size_t data_size)
 {
     linked_list *ls = (linked_list *)malloc(sizeof(linked_list));
     ls->head = init_linked_list_node(NULL, 0, NULL, NULL);
@@ -45,6 +38,7 @@ linked_list *init_linked_list()
     ls->head->next = ls->tail;
     ls->head->last = ls->tail;
     ls->length = 0;
+    ls->data_size = data_size;
     return ls;
 }
 
@@ -53,24 +47,24 @@ int linked_list_is_empty(linked_list *ls)
     return ls->length == 0;
 }
 
-void linked_list_insert(linked_list *ls, data_type *data, size_t data_size, int index)
+void linked_list_insert(linked_list *ls, data_type *data, size_t index)
 {
-    if (index < 0)
-    {
-        printf("linked_list insert error: index < 0!\n");
-        exit(1);
-    }
     if (index > ls->length)
     {
         printf("linked_list insert error: index > length!\n");
         exit(1);
     }
+    size_t data_size = ls->data_size;
     linked_list_node *p = ls->head; //-1
-    int i = -1;
-    while (i < index - 1)
+    if (index != 0)
     {
-        p = p->next;
-        i++;
+        p = ls->head->next;
+        size_t i = 0;
+        while (i < index - 1)
+        {
+            p = p->next;
+            i++;
+        }
     }
     //p pointers to the pre node of inserting node
     linked_list_node *post = p->next;
@@ -83,29 +77,28 @@ void linked_list_insert(linked_list *ls, data_type *data, size_t data_size, int 
     return;
 }
 
-void linked_list_push_back(linked_list *ls, data_type *data, size_t data_size)
+void linked_list_push_back(linked_list *ls, data_type *data)
 {
-    linked_list_insert(ls, data, data_size, ls->length);
+    linked_list_insert(ls, data, ls->length);
 }
 
-void linked_list_delete(linked_list *ls, int index)
+void linked_list_delete(linked_list *ls, size_t index)
 {
-    if (index < 0)
-    {
-        printf("linked_list delete error: index < 0!\n");
-        exit(1);
-    }
     if (index >= ls->length)
     {
         printf("linked_list delete error: index >= length!\n");
         exit(1);
     }
     linked_list_node *p = ls->head; //-1
-    int i = -1;
-    while (i < index - 1)
+    if (index != 0)
     {
-        p = p->next;
-        i++;
+        p = ls->head->next;
+        size_t i = 0;
+        while (i < index - 1)
+        {
+            p = p->next;
+            i++;
+        }
     }
     linked_list_node *node = p->next;
     linked_list_node *post = node->next;
@@ -121,20 +114,15 @@ void linked_list_pop_back(linked_list *ls)
     linked_list_delete(ls, ls->length - 1);
 }
 
-data_type *linked_list_get_data(linked_list *ls, int index)
+data_type *linked_list_get_data(linked_list *ls, size_t index)
 {
-    if (index < 0)
-    {
-        printf("linked_list get data error: index < 0!\n");
-        exit(1);
-    }
     if (index >= ls->length)
     {
         printf("linked_list get data error: index >= length!\n");
         exit(1);
     }
-    linked_list_node *p = ls->head; //-1
-    int i = -1;
+    linked_list_node *p = ls->head->next;
+    int i = 0;
     while (i < index)
     {
         p = p->next;
@@ -143,7 +131,7 @@ data_type *linked_list_get_data(linked_list *ls, int index)
     return p->data;
 }
 
-int linked_list_get_length(linked_list *ls)
+size_t linked_list_get_length(linked_list *ls)
 {
     return ls->length;
 }

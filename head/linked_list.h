@@ -1,12 +1,11 @@
 #ifndef _LINKED_LIST_H
 #define _LINKED_LIST_H
 
-#define data_type void
+#include "common.h"
 
 typedef struct linked_list_node
 {
     data_type *data;
-    size_t data_size;
     struct linked_list_node *next;
     struct linked_list_node *last;
 } linked_list_node;
@@ -22,24 +21,25 @@ typedef struct linked_list
 {
     linked_list_node *head;
     linked_list_node *tail;
-    int length;
+    size_t length;
+    size_t data_size;
 } linked_list;
 
-linked_list *init_linked_list();
+linked_list *init_linked_list(size_t data_size);
 
 int linked_list_is_empty(linked_list *ls);
 
-void linked_list_insert(linked_list *ls, data_type *data, size_t data_size, int index);
+void linked_list_insert(linked_list *ls, data_type *data, size_t index);
 
-void linked_list_push_back(linked_list *ls, data_type *data, size_t data_size);
+void linked_list_push_back(linked_list *ls, data_type *data);
 
-void linked_list_delete(linked_list *ls, int index);
+void linked_list_delete(linked_list *ls, size_t index);
 
 void linked_list_pop_back(linked_list *ls);
 
-data_type *linked_list_get_data(linked_list *ls, int index);
+data_type *linked_list_get_data(linked_list *ls, size_t index);
 
-int linked_list_get_length(linked_list *ls);
+size_t linked_list_get_length(linked_list *ls);
 
 void destory_linked_list(linked_list **ls_ptr);
 

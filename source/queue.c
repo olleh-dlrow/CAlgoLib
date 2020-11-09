@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "queue.h"
 
 /**
@@ -14,11 +11,7 @@ queue_node *init_queue_node(data_type *data,
     queue_node *node = (queue_node *)malloc(sizeof(queue_node));
     //node->data = data
     node->data = (data_type *)malloc(data_size);
-    char *bytes = (char *)data;
-    for (size_t i = 0; i < data_size; i++)
-    {
-        *(char *)(node->data + i) = bytes[i];
-    }
+    shift_data(data, node->data, data_size);
     //
     node->last = last;
     return node;
@@ -37,12 +30,13 @@ void destory_queue_node(queue_node **node_ptr)
  * queue
 */
 
-queue *init_queue()
+queue *init_queue(size_t data_size)
 {
     queue *qu = (queue *)malloc(sizeof(queue));
     qu->tail = init_queue_node(NULL, 0, NULL);
     qu->p_head = qu->tail;
     qu->length = 0;
+    qu->data_size = data_size;
     return qu;
 }
 
@@ -51,9 +45,9 @@ int queue_is_empty(queue *qu)
     return qu->length == 0;
 }
 
-void queue_push_front(queue *qu, data_type *data, size_t data_size)
+void queue_push_front(queue *qu, data_type *data)
 {
-    queue_node *node = init_queue_node(data, data_size, NULL);
+    queue_node *node = init_queue_node(data, qu->data_size, NULL);
     qu->p_head->last = node;
     qu->p_head = node;
     qu->length++;
@@ -78,13 +72,18 @@ void queue_pop_back(queue *qu)
     return;
 }
 
-int queue_get_length(queue *qu)
+size_t queue_get_length(queue *qu)
 {
     return qu->length;
 }
 
 data_type *queue_get_back(queue *qu)
 {
+    if (queue_is_empty(qu))
+    {
+        printf("queue get back error: queue is empty!\n");
+        exit(1);
+    }
     return qu->tail->last->data;
 }
 

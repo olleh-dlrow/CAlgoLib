@@ -1,29 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "array_list.h"
 
-array_list *init_array_list()
+array_list *init_array_list(size_t data_size)
 {
     array_list *arr = (array_list *)malloc(sizeof(array_list));
-    arr->capacity = 16;
+    arr->capacity = MIN_CAPACITY;
     arr->array = (array_list_node *)calloc(arr->capacity, sizeof(array_list_node));
     arr->length = 0;
-}
-
-void array_list_add_capacity(array_list *arr)
-{
-    arr->capacity <<= 1;
-    array_list_node *tmp =
-        (array_list_node *)calloc(arr->capacity, sizeof(array_list_node));
-    for (int i = 0; i < arr->length; i++)
-    {
-        tmp[i] = arr->array[i];
-    }
-    free(arr->array);
-    arr->array = tmp;
-    tmp = NULL;
-    return;
+    arr->data_size = data_size;
+    return arr;
 }
 
 int array_list_is_empty(array_list *arr)
@@ -31,24 +15,21 @@ int array_list_is_empty(array_list *arr)
     return arr->length == 0;
 }
 
-int array_list_get_length(array_list *arr)
+size_t array_list_get_length(array_list *arr)
 {
     return arr->length;
 }
 
-void array_list_push_back(array_list *arr, data_type *data, size_t data_size)
+void array_list_push_back(array_list *arr, data_type *data)
 {
+    size_t data_size = arr->data_size;
     if (arr->capacity <= arr->length)
     {
-        array_list_add_capacity(arr);
+        expand_capacity((void **)&arr->array, &arr->capacity, sizeof(array_list_node));
     }
     array_list_node *node = &arr->array[arr->length];
     node->data = (data_type *)malloc(data_size);
-    char *bytes = (char *)data;
-    for (size_t i = 0; i < data_size; i++)
-    {
-        *(char *)(node->data + i) = bytes[i];
-    }
+    shift_data(data, node->data, data_size);
     arr->length++;
     return;
 }
@@ -66,13 +47,8 @@ void array_list_pop_back(array_list *arr)
     return;
 }
 
-data_type *array_list_get_data(array_list *arr, int index)
+data_type *array_list_get_data(array_list *arr, size_t index)
 {
-    if (index < 0)
-    {
-        printf("array_list get data error: index < 0!\n");
-        exit(1);
-    }
     if (index >= arr->length)
     {
         printf("array_list get data error: index >= length!\n");
@@ -82,28 +58,25 @@ data_type *array_list_get_data(array_list *arr, int index)
     return node->data;
 }
 
-void array_list_insert(array_list *arr, data_type *data, size_t data_size, int index)
+void array_list_insert(array_list *arr, data_type *data, size_t index)
 {
-    if (index < 0)
-    {
-        printf("array_list insert error: index < 0!\n");
-        exit(1);
-    }
     if (index > arr->length)
     {
         printf("array_list insert error: index > length!\n");
         exit(1);
     }
+
+    size_t data_size = arr->data_size;
     if (arr->capacity <= arr->length)
     {
-        array_list_add_capacity(arr);
+        expand_capacity((void **)&arr->array, &arr->capacity, sizeof(array_list_node));
     }
     if (index == arr->length)
     {
-        array_list_push_back(arr, data, data_size);
+        array_list_push_back(arr, data);
         return;
     }
-    int i = arr->length - 1;
+    size_t i = arr->length - 1;
     array_list_node *p = &arr->array[i];
     array_list_node *post = &arr->array[i + 1];
     while (i >= index)
@@ -116,28 +89,19 @@ void array_list_insert(array_list *arr, data_type *data, size_t data_size, int i
     array_list_node *node = &arr->array[index];
     //new data
     node->data = (data_type *)malloc(data_size);
-    char *bytes = (char *)data;
-    for (size_t i = 0; i < data_size; i++)
-    {
-        *(char *)(node->data + i) = bytes[i];
-    }
+    shift_data(data, node->data, data_size);
     arr->length++;
     return;
 }
 
-void array_list_delete(array_list *arr, int index)
+void array_list_delete(array_list *arr, size_t index)
 {
-    if (index < 0)
-    {
-        printf("array_list delete error: index < 0!\n");
-        exit(1);
-    }
     if (index >= arr->length)
     {
         printf("array_list delete error: index >= length!\n");
         exit(1);
     }
-    int i = index + 1;
+    size_t i = index + 1;
     array_list_node *pre = &arr->array[i - 1];
     array_list_node *post = &arr->array[i];
     free(pre->data);
