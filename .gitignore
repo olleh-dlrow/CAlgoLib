@@ -3,4 +3,6 @@
 !/head/*
 !/source
 !/source/*
+!/release
+!/release/*
 !.gitignore

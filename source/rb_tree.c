@@ -254,7 +254,7 @@ void _rbt_delete(red_black_tree *rbt, rbt_node *root, key_type *key)
                         rbt->get_key(inorder_successor->data));
         }
     }
-    if (rbt->cmp_func(root_key, key) < 0)
+    else if (rbt->cmp_func(root_key, key) < 0)
     {
         _rbt_delete(rbt, root->right, key);
     }
