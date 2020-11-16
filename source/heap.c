@@ -1,6 +1,6 @@
 #include "heap.h"
 
-//a < b, 小根堆
+/*a < b, 小根堆*/
 heap *init_heap(size_t data_size, int (*cmp_func)(void *a, void *b))
 {
     heap *hp = (heap *)malloc(sizeof(heap));

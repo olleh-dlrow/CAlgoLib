@@ -130,3 +130,4 @@ void destory_array_list(array_list **arr_ptr)
     *arr_ptr = NULL;
     return;
 }
+

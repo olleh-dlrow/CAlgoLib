@@ -4,11 +4,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef void data_type;
+// #define DBG
+
+#ifdef DBG
+#define log(fmt, args...) printf(fmt, ##args)
+#else
+#define log(fmt, args...)
+#endif
 
 #define MAX_CAPACITY (~(size_t)0)
 
 #define MIN_CAPACITY ((size_t)0xf)
+
+typedef void data_type;
+
+typedef void key_type;
+
+typedef void value_type;
 
 void shift_data(data_type *src_data, data_type *dst_data, size_t data_size);
 
