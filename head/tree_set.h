@@ -23,6 +23,8 @@ int tree_set_is_empty(tree_set *tset);
 
 void tree_set_put(tree_set *tset, data_type *data);
 
+int tree_set_has_data(tree_set *tset, data_type *data);
+
 void _tree_set_to_array(tree_set *tset, rbt_node *root, array_list *arr);
 
 array_list *tree_set_to_array(tree_set *tset);

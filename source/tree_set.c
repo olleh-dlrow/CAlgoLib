@@ -32,6 +32,12 @@ void tree_set_put(tree_set *tset, data_type *data)
     return;
 }
 
+int tree_set_has_data(tree_set *tset, data_type *data)
+{
+    data_type *p = rbt_search(tset->rbt, data);
+    return p != NULL;
+}
+
 void _tree_set_to_array(tree_set *tset, rbt_node *root, array_list *arr)
 {
     if (root == NULL || root->is_null_leaf)
