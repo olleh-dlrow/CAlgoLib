@@ -1,173 +1,105 @@
 #include "myutil.h"
 
-array_list *init_array_list(size_t data_size)
-{
-    array_list *arr = (array_list *)malloc(sizeof(array_list));
-    arr->capacity = MIN_CAPACITY;
-    arr->array = (array_list_node *)calloc(arr->capacity, sizeof(array_list_node));
-    arr->length = 0;
-    arr->data_size = data_size;
-    return arr;
-}
+/**
+ * queue_node
+*/
 
-int array_list_is_empty(array_list *arr)
+queue_node *init_queue_node(data_type *data,
+                            size_t data_size,
+                            queue_node *last)
 {
-    return arr->length == 0;
-}
-
-size_t array_list_get_length(array_list *arr)
-{
-    return arr->length;
-}
-
-void array_list_push_back(array_list *arr, data_type *data)
-{
-    size_t data_size = arr->data_size;
-    if (arr->capacity <= arr->length)
-    {
-        expand_capacity((void **)&arr->array, &arr->capacity, sizeof(array_list_node));
-    }
-    array_list_node *node = &arr->array[arr->length];
+    queue_node *node = (queue_node *)malloc(sizeof(queue_node));
+    //node->data = data
     node->data = (data_type *)malloc(data_size);
     shift_data(data, node->data, data_size);
-    arr->length++;
+    //
+    node->last = last;
+    return node;
+}
+
+void destory_queue_node(queue_node **node_ptr)
+{
+    queue_node *node = *node_ptr;
+    free(node->data);
+    free(node);
+    *node_ptr = NULL;
     return;
 }
 
-void array_list_pop_back(array_list *arr)
+/**
+ * queue
+*/
+
+queue *init_queue(size_t data_size)
 {
-    if (array_list_is_empty(arr))
+    queue *qu = (queue *)malloc(sizeof(queue));
+    qu->tail = init_queue_node(NULL, 0, NULL);
+    qu->p_head = qu->tail;
+    qu->length = 0;
+    qu->data_size = data_size;
+    return qu;
+}
+
+int queue_is_empty(queue *qu)
+{
+    return qu->length == 0;
+}
+
+void queue_push_front(queue *qu, data_type *data)
+{
+    queue_node *node = init_queue_node(data, qu->data_size, NULL);
+    qu->p_head->last = node;
+    qu->p_head = node;
+    qu->length++;
+    return;
+}
+
+void queue_pop_back(queue *qu)
+{
+    if (queue_is_empty(qu))
     {
-        printf("array_list pop_back error: array_list is empty!\n");
+        printf("queue pop back error: queue is empty!\n");
         exit(1);
     }
-    array_list_node *node = &arr->array[arr->length - 1];
-    node->data = NULL;
-    arr->length--;
+    queue_node *node = qu->tail->last;
+    qu->tail->last = node->last;
+    destory_queue_node(&node);
+    qu->length--;
+    if (queue_get_length(qu) == 0)
+    {
+        qu->p_head = qu->tail;
+    }
     return;
 }
 
-data_type *array_list_get_data(array_list *arr, size_t index)
+size_t queue_get_length(queue *qu)
 {
-    if (index >= arr->length)
+    return qu->length;
+}
+
+data_type *queue_get_back(queue *qu)
+{
+    if (queue_is_empty(qu))
     {
-        printf("array_list get data error: index >= length!\n");
+        printf("queue get back error: queue is empty!\n");
         exit(1);
     }
-    array_list_node *node = &arr->array[index];
-    return node->data;
+    return qu->tail->last->data;
 }
 
-void array_list_insert(array_list *arr, data_type *data, size_t index)
+void destory_queue(queue **qu_ptr)
 {
-    if (index > arr->length)
+    queue *qu = *qu_ptr;
+    while (!queue_is_empty(qu))
     {
-        printf("array_list insert error: index > length!\n");
-        exit(1);
+        queue_pop_back(qu);
     }
-
-    size_t data_size = arr->data_size;
-    if (arr->capacity <= arr->length)
-    {
-        expand_capacity((void **)&arr->array, &arr->capacity, sizeof(array_list_node));
-    }
-    if (index == arr->length)
-    {
-        array_list_push_back(arr, data);
-        return;
-    }
-    size_t i = arr->length - 1;
-    array_list_node *p = &arr->array[i];
-    array_list_node *post = &arr->array[i + 1];
-    while (i >= index)
-    {
-        post->data = p->data;
-        i--;
-        p = &arr->array[i];
-        post = &arr->array[i + 1];
-    }
-    array_list_node *node = &arr->array[index];
-    //new data
-    node->data = (data_type *)malloc(data_size);
-    shift_data(data, node->data, data_size);
-    arr->length++;
+    destory_queue_node(&qu->tail);
+    free(qu);
+    *qu_ptr = NULL;
     return;
 }
 
-void array_list_delete(array_list *arr, size_t index)
-{
-    if (index >= arr->length)
-    {
-        printf("array_list delete error: index >= length!\n");
-        exit(1);
-    }
-    size_t i = index + 1;
-    array_list_node *pre = &arr->array[i - 1];
-    array_list_node *post = &arr->array[i];
-    free(pre->data);
-    while (i <= arr->length - 1)
-    {
-        pre->data = post->data;
-        i++;
-        pre = &arr->array[i - 1];
-        post = &arr->array[i];
-    }
-    pre->data = NULL;
-    arr->length--;
-    return;
-}
-
-void destory_array_list(array_list **arr_ptr)
-{
-    array_list *arr = *arr_ptr;
-    for (size_t i = 0; i < arr->length; i++)
-    {
-        array_list_node *node = &arr->array[i];
-        free(node->data);
-    }
-    free(arr->array);
-    free(arr);
-    *arr_ptr = NULL;
-    return;
-}
-
-void shift_data(data_type *src_data, data_type *dst_data, size_t data_size)
-{
-    char *bytes = src_data;
-    for (size_t i = 0; i < data_size; i++)
-    {
-        *(char *)(dst_data + i) = bytes[i];
-    }
-    return;
-}
-
-void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size)
-{
-    if (*src_capacity == MAX_CAPACITY)
-    {
-        printf("add capacity error: capacity over INT_MAX!\n");
-        exit(1);
-    }
-    void *arr = *arr_ptr;
-    size_t length = *src_capacity;
-    *src_capacity = ((*src_capacity) << 1) | 0x1;
-    void *tmp = (void *)calloc(*src_capacity, elem_size);
-    char *p = tmp;
-    char *q = arr;
-    for (size_t i = 0; i < length; i++)
-    {
-        for (size_t j = 0; j < elem_size; j++)
-        {
-            *p = *q;
-            p++;
-            q++;
-        }
-    }
-    free(arr);
-    *arr_ptr = tmp;
-    tmp = NULL;
-    return;
-}
 
 /*a < b, 小根堆*/
 heap *init_heap(size_t data_size, int (*cmp_func)(void *a, void *b))
@@ -272,253 +204,76 @@ void destory_heap(heap **hp_ptr)
     return;
 }
 
-/**
- * linked_list_node
-*/
-linked_list_node *init_linked_list_node(data_type *data,
-                                        size_t data_size,
-                                        linked_list_node *next,
-                                        linked_list_node *last)
+
+key_type *tree_set_get_key(data_type *data)
 {
-    linked_list_node *node = (linked_list_node *)malloc(sizeof(linked_list_node));
-    //node->data = data
-    node->data = (data_type *)malloc(data_size);
-    shift_data(data, node->data, data_size);
-    //
-    node->next = next;
-    node->last = last;
-    return node;
+    return data;
 }
 
-void destory_linked_list_node(linked_list_node **node_ptr)
+tree_set *init_tree_set(size_t data_size,
+                        int (*cmp_func)(void *a, void *b))
 {
-    linked_list_node *node = *node_ptr;
-    free(node->data);
-    free(node);
-    *node_ptr = NULL;
+    tree_set *tset = (tree_set *)malloc(sizeof(tree_set));
+    tset->data_size = data_size;
+    tset->length = 0;
+    tset->cmp_func = cmp_func;
+    tset->rbt = init_red_black_tree(data_size, cmp_func, tree_set_get_key);
+    return tset;
+}
+size_t tree_set_get_length(tree_set *tset)
+{
+    return tset->length;
+}
+
+int tree_set_is_empty(tree_set *tset)
+{
+    return tset->length == 0;
+}
+
+void tree_set_put(tree_set *tset, data_type *data)
+{
+    rbt_insert(tset->rbt, data);
+    tset->length = tset->rbt->node_count;
     return;
 }
 
-/**
- * linked_list
-*/
-linked_list *init_linked_list(size_t data_size)
+int tree_set_has_data(tree_set *tset, data_type *data)
 {
-    linked_list *ls = (linked_list *)malloc(sizeof(linked_list));
-    ls->head = init_linked_list_node(NULL, 0, NULL, NULL);
-    ls->tail = init_linked_list_node(NULL, 0, ls->head, ls->head);
-    ls->head->next = ls->tail;
-    ls->head->last = ls->tail;
-    ls->length = 0;
-    ls->data_size = data_size;
-    return ls;
+    data_type *p = rbt_search(tset->rbt, data);
+    return p != NULL;
 }
 
-int linked_list_is_empty(linked_list *ls)
+void _tree_set_to_array(tree_set *tset, rbt_node *root, array_list *arr)
 {
-    return ls->length == 0;
+    if (root == NULL || root->is_null_leaf)
+    {
+        return;
+    }
+    _tree_set_to_array(tset, root->left, arr);
+    array_list_push_back(arr, root->data);
+    _tree_set_to_array(tset, root->right, arr);
 }
 
-void linked_list_insert(linked_list *ls, data_type *data, size_t index)
+array_list *tree_set_to_array(tree_set *tset)
 {
-    if (index > ls->length)
-    {
-        printf("linked_list insert error: index > length!\n");
-        exit(1);
-    }
-    size_t data_size = ls->data_size;
-    linked_list_node *p = ls->head; //-1
-    if (index != 0)
-    {
-        p = ls->head->next;
-        size_t i = 0;
-        while (i < index - 1)
-        {
-            p = p->next;
-            i++;
-        }
-    }
-    //p pointers to the pre node of inserting node
-    linked_list_node *post = p->next;
-    //new node
-    linked_list_node *node = init_linked_list_node(data, data_size, post, p);
-    p->next = node;
-    post->last = node;
-    //length++
-    ls->length++;
+    array_list *arr = init_array_list(tset->data_size);
+    _tree_set_to_array(tset, tset->rbt->root, arr);
+    return arr;
+}
+
+void tree_set_delete(tree_set *tset, data_type *data)
+{
+    rbt_delete(tset->rbt, data);
+    tset->length = tset->rbt->node_count;
     return;
 }
 
-void linked_list_push_back(linked_list *ls, data_type *data)
+void destory_tree_set(tree_set **tset_ptr)
 {
-    linked_list_insert(ls, data, ls->length);
-}
-
-void linked_list_delete(linked_list *ls, size_t index)
-{
-    if (index >= ls->length)
-    {
-        printf("linked_list delete error: index >= length!\n");
-        exit(1);
-    }
-    linked_list_node *p = ls->head; //-1
-    if (index != 0)
-    {
-        p = ls->head->next;
-        size_t i = 0;
-        while (i < index - 1)
-        {
-            p = p->next;
-            i++;
-        }
-    }
-    linked_list_node *node = p->next;
-    linked_list_node *post = node->next;
-    p->next = post;
-    post->last = p;
-    destory_linked_list_node(&node);
-    ls->length--;
-    return;
-}
-
-void linked_list_pop_back(linked_list *ls)
-{
-    linked_list_delete(ls, ls->length - 1);
-}
-
-data_type *linked_list_get_data(linked_list *ls, size_t index)
-{
-    if (index >= ls->length)
-    {
-        printf("linked_list get data error: index >= length!\n");
-        exit(1);
-    }
-    linked_list_node *p = ls->head->next;
-    int i = 0;
-    while (i < index)
-    {
-        p = p->next;
-        i++;
-    }
-    return p->data;
-}
-
-size_t linked_list_get_length(linked_list *ls)
-{
-    return ls->length;
-}
-
-void destory_linked_list(linked_list **ls_ptr)
-{
-    linked_list *ls = *ls_ptr;
-    while (!linked_list_is_empty(ls))
-    {
-        linked_list_delete(ls, 0);
-    }
-    destory_linked_list_node(&ls->head);
-    destory_linked_list_node(&ls->tail);
-    free(*ls_ptr);
-    *ls_ptr = NULL;
-    return;
-}
-
-/**
- * queue_node
-*/
-
-queue_node *init_queue_node(data_type *data,
-                            size_t data_size,
-                            queue_node *last)
-{
-    queue_node *node = (queue_node *)malloc(sizeof(queue_node));
-    //node->data = data
-    node->data = (data_type *)malloc(data_size);
-    shift_data(data, node->data, data_size);
-    //
-    node->last = last;
-    return node;
-}
-
-void destory_queue_node(queue_node **node_ptr)
-{
-    queue_node *node = *node_ptr;
-    free(node->data);
-    free(node);
-    *node_ptr = NULL;
-    return;
-}
-
-/**
- * queue
-*/
-
-queue *init_queue(size_t data_size)
-{
-    queue *qu = (queue *)malloc(sizeof(queue));
-    qu->tail = init_queue_node(NULL, 0, NULL);
-    qu->p_head = qu->tail;
-    qu->length = 0;
-    qu->data_size = data_size;
-    return qu;
-}
-
-int queue_is_empty(queue *qu)
-{
-    return qu->length == 0;
-}
-
-void queue_push_front(queue *qu, data_type *data)
-{
-    queue_node *node = init_queue_node(data, qu->data_size, NULL);
-    qu->p_head->last = node;
-    qu->p_head = node;
-    qu->length++;
-    return;
-}
-
-void queue_pop_back(queue *qu)
-{
-    if (queue_is_empty(qu))
-    {
-        printf("queue pop back error: queue is empty!\n");
-        exit(1);
-    }
-    queue_node *node = qu->tail->last;
-    qu->tail->last = node->last;
-    destory_queue_node(&node);
-    qu->length--;
-    if (queue_get_length(qu) == 0)
-    {
-        qu->p_head = qu->tail;
-    }
-    return;
-}
-
-size_t queue_get_length(queue *qu)
-{
-    return qu->length;
-}
-
-data_type *queue_get_back(queue *qu)
-{
-    if (queue_is_empty(qu))
-    {
-        printf("queue get back error: queue is empty!\n");
-        exit(1);
-    }
-    return qu->tail->last->data;
-}
-
-void destory_queue(queue **qu_ptr)
-{
-    queue *qu = *qu_ptr;
-    while (!queue_is_empty(qu))
-    {
-        queue_pop_back(qu);
-    }
-    destory_queue_node(&qu->tail);
-    free(qu);
-    *qu_ptr = NULL;
+    tree_set *tset = *tset_ptr;
+    destory_red_black_tree(&tset->rbt);
+    free(tset);
+    *tset_ptr = NULL;
     return;
 }
 
@@ -1160,6 +915,7 @@ int no_red_red_parent_child(rbt_node *root, rbt_color parent_color)
     return no_red_red_parent_child(root->left, root->color) && no_red_red_parent_child(root->right, root->color);
 }
 
+
 /**
  * stack_node
 */
@@ -1250,6 +1006,8 @@ void destory_stack(stack **st_ptr)
     return;
 }
 
+
+
 tree_map *init_tree_map(size_t pair_size,
                         int (*cmp_func)(void *a, void *b),
                         key_type *(*get_key)(pair_type *pair),
@@ -1314,74 +1072,326 @@ void destory_tree_map(tree_map **tmap_ptr)
     return;
 }
 
-key_type *tree_set_get_key(data_type *data)
-{
-    return data;
-}
 
-tree_set *init_tree_set(size_t data_size,
-                        int (*cmp_func)(void *a, void *b))
+array_list *init_array_list(size_t data_size)
 {
-    tree_set *tset = (tree_set *)malloc(sizeof(tree_set));
-    tset->data_size = data_size;
-    tset->length = 0;
-    tset->cmp_func = cmp_func;
-    tset->rbt = init_red_black_tree(data_size, cmp_func, tree_set_get_key);
-    return tset;
-}
-size_t tree_set_get_length(tree_set *tset)
-{
-    return tset->length;
-}
-
-int tree_set_is_empty(tree_set *tset)
-{
-    return tset->length == 0;
-}
-
-void tree_set_put(tree_set *tset, data_type *data)
-{
-    rbt_insert(tset->rbt, data);
-    tset->length = tset->rbt->node_count;
-    return;
-}
-
-int tree_set_has_data(tree_set *tset, data_type *data)
-{
-    data_type *p = rbt_search(tset->rbt, data);
-    return p != NULL;
-}
-
-void _tree_set_to_array(tree_set *tset, rbt_node *root, array_list *arr)
-{
-    if (root == NULL || root->is_null_leaf)
-    {
-        return;
-    }
-    _tree_set_to_array(tset, root->left, arr);
-    array_list_push_back(arr, root->data);
-    _tree_set_to_array(tset, root->right, arr);
-}
-
-array_list *tree_set_to_array(tree_set *tset)
-{
-    array_list *arr = init_array_list(tset->data_size);
-    _tree_set_to_array(tset, tset->rbt->root, arr);
+    array_list *arr = (array_list *)malloc(sizeof(array_list));
+    arr->capacity = MIN_CAPACITY;
+    arr->array = (array_list_node *)calloc(arr->capacity, sizeof(array_list_node));
+    arr->length = 0;
+    arr->data_size = data_size;
     return arr;
 }
 
-void tree_set_delete(tree_set *tset, data_type *data)
+int array_list_is_empty(array_list *arr)
 {
-    rbt_delete(tset->rbt, data);
-    tset->length = tset->rbt->node_count;
+    return arr->length == 0;
+}
+
+size_t array_list_get_length(array_list *arr)
+{
+    return arr->length;
+}
+
+void array_list_push_back(array_list *arr, data_type *data)
+{
+    size_t data_size = arr->data_size;
+    if (arr->capacity <= arr->length)
+    {
+        expand_capacity((void **)&arr->array, &arr->capacity, sizeof(array_list_node));
+    }
+    array_list_node *node = &arr->array[arr->length];
+    node->data = (data_type *)malloc(data_size);
+    shift_data(data, node->data, data_size);
+    arr->length++;
     return;
 }
 
-void destory_tree_set(tree_set **tset_ptr)
+void array_list_pop_back(array_list *arr)
 {
-    tree_set *tset = *tset_ptr;
-    destory_red_black_tree(&tset->rbt);
-    free(tset);
-    *tset_ptr = NULL;
+    if (array_list_is_empty(arr))
+    {
+        printf("array_list pop_back error: array_list is empty!\n");
+        exit(1);
+    }
+    array_list_node *node = &arr->array[arr->length - 1];
+    node->data = NULL;
+    arr->length--;
     return;
 }
+
+data_type *array_list_get_data(array_list *arr, size_t index)
+{
+    if (index >= arr->length)
+    {
+        printf("array_list get data error: index >= length!\n");
+        exit(1);
+    }
+    array_list_node *node = &arr->array[index];
+    return node->data;
+}
+
+void array_list_insert(array_list *arr, data_type *data, size_t index)
+{
+    if (index > arr->length)
+    {
+        printf("array_list insert error: index > length!\n");
+        exit(1);
+    }
+
+    size_t data_size = arr->data_size;
+    if (arr->capacity <= arr->length)
+    {
+        expand_capacity((void **)&arr->array, &arr->capacity, sizeof(array_list_node));
+    }
+    if (index == arr->length)
+    {
+        array_list_push_back(arr, data);
+        return;
+    }
+    size_t i = arr->length - 1;
+    array_list_node *p = &arr->array[i];
+    array_list_node *post = &arr->array[i + 1];
+    while (i >= index)
+    {
+        post->data = p->data;
+        i--;
+        p = &arr->array[i];
+        post = &arr->array[i + 1];
+    }
+    array_list_node *node = &arr->array[index];
+    //new data
+    node->data = (data_type *)malloc(data_size);
+    shift_data(data, node->data, data_size);
+    arr->length++;
+    return;
+}
+
+void array_list_delete(array_list *arr, size_t index)
+{
+    if (index >= arr->length)
+    {
+        printf("array_list delete error: index >= length!\n");
+        exit(1);
+    }
+    size_t i = index + 1;
+    array_list_node *pre = &arr->array[i - 1];
+    array_list_node *post = &arr->array[i];
+    free(pre->data);
+    while (i <= arr->length - 1)
+    {
+        pre->data = post->data;
+        i++;
+        pre = &arr->array[i - 1];
+        post = &arr->array[i];
+    }
+    pre->data = NULL;
+    arr->length--;
+    return;
+}
+
+void destory_array_list(array_list **arr_ptr)
+{
+    array_list *arr = *arr_ptr;
+    for (size_t i = 0; i < arr->length; i++)
+    {
+        array_list_node *node = &arr->array[i];
+        free(node->data);
+    }
+    free(arr->array);
+    free(arr);
+    *arr_ptr = NULL;
+    return;
+}
+
+
+
+void shift_data(data_type *src_data, data_type *dst_data, size_t data_size)
+{
+    char *bytes = src_data;
+    for (size_t i = 0; i < data_size; i++)
+    {
+        *(char *)(dst_data + i) = bytes[i];
+    }
+    return;
+}
+
+void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size)
+{
+    if (*src_capacity == MAX_CAPACITY)
+    {
+        printf("add capacity error: capacity over INT_MAX!\n");
+        exit(1);
+    }
+    void *arr = *arr_ptr;
+    size_t length = *src_capacity;
+    *src_capacity = ((*src_capacity) << 1) | 0x1;
+    void *tmp = (void *)calloc(*src_capacity, elem_size);
+    char *p = tmp;
+    char *q = arr;
+    for (size_t i = 0; i < length; i++)
+    {
+        for (size_t j = 0; j < elem_size; j++)
+        {
+            *p = *q;
+            p++;
+            q++;
+        }
+    }
+    free(arr);
+    *arr_ptr = tmp;
+    tmp = NULL;
+    return;
+}
+
+
+/**
+ * linked_list_node
+*/
+linked_list_node *init_linked_list_node(data_type *data,
+                                        size_t data_size,
+                                        linked_list_node *next,
+                                        linked_list_node *last)
+{
+    linked_list_node *node = (linked_list_node *)malloc(sizeof(linked_list_node));
+    //node->data = data
+    node->data = (data_type *)malloc(data_size);
+    shift_data(data, node->data, data_size);
+    //
+    node->next = next;
+    node->last = last;
+    return node;
+}
+
+void destory_linked_list_node(linked_list_node **node_ptr)
+{
+    linked_list_node *node = *node_ptr;
+    free(node->data);
+    free(node);
+    *node_ptr = NULL;
+    return;
+}
+
+/**
+ * linked_list
+*/
+linked_list *init_linked_list(size_t data_size)
+{
+    linked_list *ls = (linked_list *)malloc(sizeof(linked_list));
+    ls->head = init_linked_list_node(NULL, 0, NULL, NULL);
+    ls->tail = init_linked_list_node(NULL, 0, ls->head, ls->head);
+    ls->head->next = ls->tail;
+    ls->head->last = ls->tail;
+    ls->length = 0;
+    ls->data_size = data_size;
+    return ls;
+}
+
+int linked_list_is_empty(linked_list *ls)
+{
+    return ls->length == 0;
+}
+
+void linked_list_insert(linked_list *ls, data_type *data, size_t index)
+{
+    if (index > ls->length)
+    {
+        printf("linked_list insert error: index > length!\n");
+        exit(1);
+    }
+    size_t data_size = ls->data_size;
+    linked_list_node *p = ls->head; //-1
+    if (index != 0)
+    {
+        p = ls->head->next;
+        size_t i = 0;
+        while (i < index - 1)
+        {
+            p = p->next;
+            i++;
+        }
+    }
+    //p pointers to the pre node of inserting node
+    linked_list_node *post = p->next;
+    //new node
+    linked_list_node *node = init_linked_list_node(data, data_size, post, p);
+    p->next = node;
+    post->last = node;
+    //length++
+    ls->length++;
+    return;
+}
+
+void linked_list_push_back(linked_list *ls, data_type *data)
+{
+    linked_list_insert(ls, data, ls->length);
+}
+
+void linked_list_delete(linked_list *ls, size_t index)
+{
+    if (index >= ls->length)
+    {
+        printf("linked_list delete error: index >= length!\n");
+        exit(1);
+    }
+    linked_list_node *p = ls->head; //-1
+    if (index != 0)
+    {
+        p = ls->head->next;
+        size_t i = 0;
+        while (i < index - 1)
+        {
+            p = p->next;
+            i++;
+        }
+    }
+    linked_list_node *node = p->next;
+    linked_list_node *post = node->next;
+    p->next = post;
+    post->last = p;
+    destory_linked_list_node(&node);
+    ls->length--;
+    return;
+}
+
+void linked_list_pop_back(linked_list *ls)
+{
+    linked_list_delete(ls, ls->length - 1);
+}
+
+data_type *linked_list_get_data(linked_list *ls, size_t index)
+{
+    if (index >= ls->length)
+    {
+        printf("linked_list get data error: index >= length!\n");
+        exit(1);
+    }
+    linked_list_node *p = ls->head->next;
+    int i = 0;
+    while (i < index)
+    {
+        p = p->next;
+        i++;
+    }
+    return p->data;
+}
+
+size_t linked_list_get_length(linked_list *ls)
+{
+    return ls->length;
+}
+
+void destory_linked_list(linked_list **ls_ptr)
+{
+    linked_list *ls = *ls_ptr;
+    while (!linked_list_is_empty(ls))
+    {
+        linked_list_delete(ls, 0);
+    }
+    destory_linked_list_node(&ls->head);
+    destory_linked_list_node(&ls->tail);
+    free(*ls_ptr);
+    *ls_ptr = NULL;
+    return;
+}
+

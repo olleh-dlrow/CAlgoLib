@@ -1,10 +1,8 @@
-#ifndef MY_UTIL_H
-#define MY_UTIL_H
+#ifndef _MYUTIL_H
+#define _MYUTIL_H
 
 #include <stdio.h>
 #include <stdlib.h>
-
-/*COMMON*/
 
 // #define DBG
 
@@ -28,7 +26,8 @@ void shift_data(data_type *src_data, data_type *dst_data, size_t data_size);
 
 void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size);
 
-/*ARRAY_LIST*/
+
+
 
 typedef struct array_list_node
 {
@@ -61,7 +60,8 @@ void array_list_delete(array_list *arr, size_t index);
 
 void destory_array_list(array_list **arr_ptr);
 
-/*HEAP*/
+
+
 
 typedef struct heap_node
 {
@@ -91,7 +91,8 @@ void heap_pop(heap *hp);
 
 void destory_heap(heap **hp_ptr);
 
-/*LINKED_LIST*/
+
+
 
 typedef struct linked_list_node
 {
@@ -133,7 +134,8 @@ size_t linked_list_get_length(linked_list *ls);
 
 void destory_linked_list(linked_list **ls_ptr);
 
-/*QUEUE*/
+
+
 
 typedef struct queue_node
 {
@@ -170,7 +172,8 @@ data_type *queue_get_back(queue *qu);
 
 void destory_queue(queue **qu_ptr);
 
-/*RED_BLACK_TREE*/
+
+
 
 typedef enum
 {
@@ -271,7 +274,8 @@ int black_nodes_count_is_same(rbt_node *root, size_t *black_count, size_t cur_co
 
 int no_red_red_parent_child(rbt_node *root, rbt_color parent_color);
 
-/*STACK*/
+
+
 
 typedef struct stack_node
 {
@@ -305,7 +309,8 @@ size_t stack_get_length(stack *st);
 
 void destory_stack(stack **st_ptr);
 
-/*TREE_MAP*/
+
+
 
 typedef void pair_type;
 
@@ -342,7 +347,8 @@ void tree_map_delete_pair(tree_map *tmap, key_type *key);
 
 void destory_tree_map(tree_map **tmap_ptr);
 
-/*TREE_SET*/
+
+
 
 typedef struct tree_set
 {
@@ -372,5 +378,6 @@ array_list *tree_set_to_array(tree_set *tset);
 void tree_set_delete(tree_set *tset, data_type *data);
 
 void destory_tree_set(tree_set **tset_ptr);
+
 
 #endif
