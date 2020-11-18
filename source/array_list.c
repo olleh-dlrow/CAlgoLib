@@ -58,6 +58,17 @@ data_type *array_list_get_data(array_list *arr, size_t index)
     return node->data;
 }
 
+void array_list_set_data(array_list *arr, data_type *data, size_t index)
+{
+    if (index >= arr->length)
+    {
+        printf("array_list set data error: index >= length!\n");
+        exit(1);
+    }
+    shift_data(data, arr->array[index].data, arr->data_size);
+    return;
+}
+
 void array_list_insert(array_list *arr, data_type *data, size_t index)
 {
     if (index > arr->length)
@@ -130,4 +141,3 @@ void destory_array_list(array_list **arr_ptr)
     *arr_ptr = NULL;
     return;
 }
-

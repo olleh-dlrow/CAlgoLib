@@ -28,6 +28,8 @@ void array_list_pop_back(array_list *arr);
 
 data_type *array_list_get_data(array_list *arr, size_t index);
 
+void array_list_set_data(array_list *arr, data_type *data, size_t index);
+
 void array_list_insert(array_list *arr, data_type *data, size_t index);
 
 void array_list_delete(array_list *arr, size_t index);
