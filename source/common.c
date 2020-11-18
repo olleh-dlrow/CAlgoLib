@@ -2,10 +2,24 @@
 
 void shift_data(data_type *src_data, data_type *dst_data, size_t data_size)
 {
-    char *bytes = src_data;
-    for (size_t i = 0; i < data_size; i++)
+    size_t tail_size = data_size;
+    size_t *dst_ptr = dst_data;
+    size_t *src_ptr = src_data;
+    while (tail_size / 8 != 0)
     {
-        *(char *)(dst_data + i) = bytes[i];
+        *dst_ptr = *src_ptr;
+        dst_ptr++;
+        src_ptr++;
+        tail_size -= 8;
+    }
+    char *_dst_ptr = (char *)dst_ptr;
+    char *_src_ptr = (char *)src_ptr;
+    while (tail_size != 0)
+    {
+        *_dst_ptr = *_src_ptr;
+        _dst_ptr++;
+        _src_ptr++;
+        tail_size--;
     }
     return;
 }

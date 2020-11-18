@@ -100,7 +100,6 @@ void destory_queue(queue **qu_ptr)
     return;
 }
 
-
 /*a < b, 小根堆*/
 heap *init_heap(size_t data_size, int (*cmp_func)(void *a, void *b))
 {
@@ -203,7 +202,6 @@ void destory_heap(heap **hp_ptr)
     *hp_ptr = NULL;
     return;
 }
-
 
 key_type *tree_set_get_key(data_type *data)
 {
@@ -915,7 +913,6 @@ int no_red_red_parent_child(rbt_node *root, rbt_color parent_color)
     return no_red_red_parent_child(root->left, root->color) && no_red_red_parent_child(root->right, root->color);
 }
 
-
 /**
  * stack_node
 */
@@ -1006,8 +1003,6 @@ void destory_stack(stack **st_ptr)
     return;
 }
 
-
-
 tree_map *init_tree_map(size_t pair_size,
                         int (*cmp_func)(void *a, void *b),
                         key_type *(*get_key)(pair_type *pair),
@@ -1071,7 +1066,6 @@ void destory_tree_map(tree_map **tmap_ptr)
     *tmap_ptr = NULL;
     return;
 }
-
 
 array_list *init_array_list(size_t data_size)
 {
@@ -1204,14 +1198,26 @@ void destory_array_list(array_list **arr_ptr)
     return;
 }
 
-
-
 void shift_data(data_type *src_data, data_type *dst_data, size_t data_size)
 {
-    char *bytes = src_data;
-    for (size_t i = 0; i < data_size; i++)
+    size_t tail_size = data_size;
+    size_t *dst_ptr = dst_data;
+    size_t *src_ptr = src_data;
+    while (tail_size / 8 != 0)
     {
-        *(char *)(dst_data + i) = bytes[i];
+        *dst_ptr = *src_ptr;
+        dst_ptr++;
+        src_ptr++;
+        tail_size -= 8;
+    }
+    char *_dst_ptr = (char *)dst_ptr;
+    char *_src_ptr = (char *)src_ptr;
+    while (tail_size != 0)
+    {
+        *_dst_ptr = *_src_ptr;
+        _dst_ptr++;
+        _src_ptr++;
+        tail_size--;
     }
     return;
 }
@@ -1243,7 +1249,6 @@ void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size)
     tmp = NULL;
     return;
 }
-
 
 /**
  * linked_list_node
@@ -1394,4 +1399,3 @@ void destory_linked_list(linked_list **ls_ptr)
     *ls_ptr = NULL;
     return;
 }
-
