@@ -49,6 +49,24 @@ value_type *tree_map_get_value(tree_map *tmap, key_type *key)
     return pair == NULL ? NULL : tmap->get_value(pair);
 }
 
+void _tree_map_to_array(tree_map *tmap, rbt_node *root, array_list *arr)
+{
+    if (root == NULL || root->is_null_leaf)
+    {
+        return;
+    }
+    _tree_map_to_array(tmap, root->left, arr);
+    array_list_push_back(arr, root->data);
+    _tree_map_to_array(tmap, root->right, arr);
+}
+
+array_list *tree_map_to_array(tree_map *tmap)
+{
+    array_list *arr = init_array_list(tmap->pair_size);
+    _tree_map_to_array(tmap, tmap->rbt->root, arr);
+    return arr;
+}
+
 void tree_map_delete_pair(tree_map *tmap, key_type *key)
 {
     rbt_delete(tmap->rbt, key);

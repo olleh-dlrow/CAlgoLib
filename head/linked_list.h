@@ -39,6 +39,8 @@ void linked_list_pop_back(linked_list *ls);
 
 data_type *linked_list_get_data(linked_list *ls, size_t index);
 
+void linked_list_set_data(linked_list *ls, data_type *data, size_t index);
+
 size_t linked_list_get_length(linked_list *ls);
 
 void destory_linked_list(linked_list **ls_ptr);

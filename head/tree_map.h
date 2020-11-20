@@ -2,6 +2,7 @@
 #define _TREE_MAP_H
 
 #include "rb_tree.h"
+#include "array_list.h"
 
 typedef void pair_type;
 
@@ -33,6 +34,10 @@ int tree_map_has_key(tree_map *tmap, key_type *key);
 pair_type *tree_map_get_pair(tree_map *tmap, key_type *key);
 
 value_type *tree_map_get_value(tree_map *tmap, key_type *key);
+
+void _tree_map_to_array(tree_map *tmap, rbt_node *root, array_list *arr);
+
+array_list *tree_map_to_array(tree_map *tmap);
 
 void tree_map_delete_pair(tree_map *tmap, key_type *key);
 

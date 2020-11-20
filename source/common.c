@@ -51,3 +51,17 @@ void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size)
     tmp = NULL;
     return;
 }
+
+char *read_string(size_t len)
+{
+    char *str = (char *)calloc(len + 1, sizeof(char));
+    char ch = '\0';
+    size_t i = 0;
+    while ((ch = getchar()) != '\n' && i < len)
+    {
+        str[i] = ch;
+        ++i;
+    }
+    str[len] = '\0';
+    return str;
+}

@@ -122,13 +122,31 @@ data_type *linked_list_get_data(linked_list *ls, size_t index)
         exit(1);
     }
     linked_list_node *p = ls->head->next;
-    int i = 0;
+    size_t i = 0;
     while (i < index)
     {
         p = p->next;
         i++;
     }
     return p->data;
+}
+
+void linked_list_set_data(linked_list *ls, data_type *data, size_t index)
+{
+    if (index > ls->length)
+    {
+        printf("linked_list set data error: index > length!\n");
+        exit(1);
+    }
+    linked_list_node *p = ls->head->next;
+    size_t i = 0;
+    while (i < index)
+    {
+        p = p->next;
+        ++i;
+    }
+    shift_data(data, p->data, ls->data_size);
+    return;
 }
 
 size_t linked_list_get_length(linked_list *ls)
