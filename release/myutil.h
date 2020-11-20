@@ -26,6 +26,8 @@ void shift_data(data_type *src_data, data_type *dst_data, size_t data_size);
 
 void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size);
 
+char *read_string(size_t len);
+
 
 
 
@@ -53,6 +55,8 @@ void array_list_push_back(array_list *arr, data_type *data);
 void array_list_pop_back(array_list *arr);
 
 data_type *array_list_get_data(array_list *arr, size_t index);
+
+void array_list_set_data(array_list *arr, data_type *data, size_t index);
 
 void array_list_insert(array_list *arr, data_type *data, size_t index);
 
@@ -129,6 +133,8 @@ void linked_list_delete(linked_list *ls, size_t index);
 void linked_list_pop_back(linked_list *ls);
 
 data_type *linked_list_get_data(linked_list *ls, size_t index);
+
+void linked_list_set_data(linked_list *ls, data_type *data, size_t index);
 
 size_t linked_list_get_length(linked_list *ls);
 
@@ -342,6 +348,10 @@ int tree_map_has_key(tree_map *tmap, key_type *key);
 pair_type *tree_map_get_pair(tree_map *tmap, key_type *key);
 
 value_type *tree_map_get_value(tree_map *tmap, key_type *key);
+
+void _tree_map_to_array(tree_map *tmap, rbt_node *root, array_list *arr);
+
+array_list *tree_map_to_array(tree_map *tmap);
 
 void tree_map_delete_pair(tree_map *tmap, key_type *key);
 

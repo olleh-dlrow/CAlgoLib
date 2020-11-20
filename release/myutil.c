@@ -100,6 +100,7 @@ void destory_queue(queue **qu_ptr)
     return;
 }
 
+
 /*a < b, 小根堆*/
 heap *init_heap(size_t data_size, int (*cmp_func)(void *a, void *b))
 {
@@ -202,6 +203,7 @@ void destory_heap(heap **hp_ptr)
     *hp_ptr = NULL;
     return;
 }
+
 
 key_type *tree_set_get_key(data_type *data)
 {
@@ -913,6 +915,7 @@ int no_red_red_parent_child(rbt_node *root, rbt_color parent_color)
     return no_red_red_parent_child(root->left, root->color) && no_red_red_parent_child(root->right, root->color);
 }
 
+
 /**
  * stack_node
 */
@@ -1003,6 +1006,8 @@ void destory_stack(stack **st_ptr)
     return;
 }
 
+
+
 tree_map *init_tree_map(size_t pair_size,
                         int (*cmp_func)(void *a, void *b),
                         key_type *(*get_key)(pair_type *pair),
@@ -1052,6 +1057,24 @@ value_type *tree_map_get_value(tree_map *tmap, key_type *key)
     return pair == NULL ? NULL : tmap->get_value(pair);
 }
 
+void _tree_map_to_array(tree_map *tmap, rbt_node *root, array_list *arr)
+{
+    if (root == NULL || root->is_null_leaf)
+    {
+        return;
+    }
+    _tree_map_to_array(tmap, root->left, arr);
+    array_list_push_back(arr, root->data);
+    _tree_map_to_array(tmap, root->right, arr);
+}
+
+array_list *tree_map_to_array(tree_map *tmap)
+{
+    array_list *arr = init_array_list(tmap->pair_size);
+    _tree_map_to_array(tmap, tmap->rbt->root, arr);
+    return arr;
+}
+
 void tree_map_delete_pair(tree_map *tmap, key_type *key)
 {
     rbt_delete(tmap->rbt, key);
@@ -1066,6 +1089,7 @@ void destory_tree_map(tree_map **tmap_ptr)
     *tmap_ptr = NULL;
     return;
 }
+
 
 array_list *init_array_list(size_t data_size)
 {
@@ -1123,6 +1147,17 @@ data_type *array_list_get_data(array_list *arr, size_t index)
     }
     array_list_node *node = &arr->array[index];
     return node->data;
+}
+
+void array_list_set_data(array_list *arr, data_type *data, size_t index)
+{
+    if (index >= arr->length)
+    {
+        printf("array_list set data error: index >= length!\n");
+        exit(1);
+    }
+    shift_data(data, arr->array[index].data, arr->data_size);
+    return;
 }
 
 void array_list_insert(array_list *arr, data_type *data, size_t index)
@@ -1198,6 +1233,7 @@ void destory_array_list(array_list **arr_ptr)
     return;
 }
 
+
 void shift_data(data_type *src_data, data_type *dst_data, size_t data_size)
 {
     size_t tail_size = data_size;
@@ -1249,6 +1285,21 @@ void expand_capacity(void **arr_ptr, size_t *src_capacity, size_t elem_size)
     tmp = NULL;
     return;
 }
+
+char *read_string(size_t len)
+{
+    char *str = (char *)calloc(len + 1, sizeof(char));
+    char ch = '\0';
+    size_t i = 0;
+    while ((ch = getchar()) != '\n' && i < len)
+    {
+        str[i] = ch;
+        ++i;
+    }
+    str[len] = '\0';
+    return str;
+}
+
 
 /**
  * linked_list_node
@@ -1372,13 +1423,31 @@ data_type *linked_list_get_data(linked_list *ls, size_t index)
         exit(1);
     }
     linked_list_node *p = ls->head->next;
-    int i = 0;
+    size_t i = 0;
     while (i < index)
     {
         p = p->next;
         i++;
     }
     return p->data;
+}
+
+void linked_list_set_data(linked_list *ls, data_type *data, size_t index)
+{
+    if (index > ls->length)
+    {
+        printf("linked_list set data error: index > length!\n");
+        exit(1);
+    }
+    linked_list_node *p = ls->head->next;
+    size_t i = 0;
+    while (i < index)
+    {
+        p = p->next;
+        ++i;
+    }
+    shift_data(data, p->data, ls->data_size);
+    return;
 }
 
 size_t linked_list_get_length(linked_list *ls)
@@ -1399,3 +1468,4 @@ void destory_linked_list(linked_list **ls_ptr)
     *ls_ptr = NULL;
     return;
 }
+
