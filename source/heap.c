@@ -69,21 +69,23 @@ void heap_pop(heap *hp)
     data_type *x = hp->array[hp->length - 1].data;
     // shift_data(hp->array[hp->length - 1].data, x, size);
     size_t i = 0;
-    while (i <= (hp->length - 2) / 2)
-    {
-        size_t left = i * 2 + 1;
-        size_t right = i * 2 + 2;
-        size_t min = left;
-        if (right <= hp->length - 1 && hp->cmp_func(hp->array[right].data, hp->array[min].data) < 0)
+    if(hp->length >= 2){
+        while (i <= (hp->length - 2) / 2)
         {
-            min = right;
+            size_t left = i * 2 + 1;
+            size_t right = i * 2 + 2;
+            size_t min = left;
+            if (right <= hp->length - 1 && hp->cmp_func(hp->array[right].data, hp->array[min].data) < 0)
+            {
+                min = right;
+            }
+            if (hp->cmp_func(hp->array[min].data, x) >= 0)
+            {
+                break;
+            }
+            hp->array[i].data = hp->array[min].data;
+            i = min;
         }
-        if (hp->cmp_func(hp->array[min].data, x) >= 0)
-        {
-            break;
-        }
-        hp->array[i].data = hp->array[min].data;
-        i = min;
     }
     hp->array[i].data = x;
     hp->length--;
