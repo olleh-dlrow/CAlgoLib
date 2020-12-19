@@ -152,6 +152,8 @@ my_string *init_my_string();
 
 void my_string_read(my_string *s, FILE *stream);
 
+void my_string_write(my_string *s, FILE *stream, char *fmt);
+
 size_t my_string_get_length(my_string *s);
 
 char my_string_index_of(my_string *s, size_t index);

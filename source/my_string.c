@@ -23,6 +23,12 @@ void my_string_read(my_string *s, FILE *stream){
     return;
 }
 
+void my_string_write(my_string *s, FILE *stream, char *fmt){
+    char *str = my_string_to_char_array(s);
+    fprintf(stream, fmt, str);
+    free(str);
+}
+
 size_t my_string_get_length(my_string *s){
     return s->length;
 }

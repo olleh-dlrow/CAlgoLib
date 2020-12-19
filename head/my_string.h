@@ -1,5 +1,5 @@
-#ifndef MY_my_string_H
-#define MY_my_string_H
+#ifndef MY_STRING_H
+#define MY_STRING_H
 
 #include"array_list.h"
 
@@ -11,6 +11,8 @@ typedef struct my_string{
 my_string *init_my_string();
 
 void my_string_read(my_string *s, FILE *stream);
+
+void my_string_write(my_string *s, FILE *stream, char *fmt);
 
 size_t my_string_get_length(my_string *s);
 
