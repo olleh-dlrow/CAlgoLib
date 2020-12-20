@@ -47,6 +47,52 @@ int linked_list_is_empty(linked_list *ls)
     return ls->length == 0;
 }
 
+linked_list_node *linked_list_next(linked_list *ls, linked_list_node *node){
+    return node->next;
+}
+
+linked_list_node *linked_list_last(linked_list *ls, linked_list_node *node){
+    return node->last;
+}
+
+linked_list_node *linked_list_delete_node(linked_list *ls, linked_list_node *node){
+    if(ls->length == 0){
+        printf("linked_list delete node error: length == 0!\n");
+        exit(1);
+    }
+    linked_list_node *pre = node->last;
+    pre->next = node->next;
+    destory_linked_list_node(&node);
+    pre->next->last = pre;
+    ls->length--;
+    return pre;
+}
+
+void linked_list_insert_node(linked_list *ls, linked_list_node *node, data_type *data){
+    linked_list_node *p = init_linked_list_node(data, ls->data_size, node->next, node);
+    node->next = p;
+    p->next->last = p;
+    ls->length++;
+    return;
+}
+
+void linked_list_set_node_data(linked_list *ls, linked_list_node *node, data_type *data){
+    shift_data(data, node->data, ls->data_size);
+    return;
+}
+
+linked_list_node *linked_list_get_head(linked_list *ls){
+    return ls->head;
+}
+
+linked_list_node *linked_list_get_tail(linked_list *ls){
+    return ls->tail;
+}
+
+data_type *linked_list_get_node_data(linked_list *ls, linked_list_node *node){
+    return node->data;
+}
+
 void linked_list_insert(linked_list *ls, data_type *data, size_t index)
 {
     if (index > ls->length)
