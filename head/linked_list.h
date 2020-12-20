@@ -1,5 +1,5 @@
-#ifndef _LINKED_LIST_H
-#define _LINKED_LIST_H
+#ifndef __LINKED_LIST_H__
+#define __LINKED_LIST_H__
 
 #include "common.h"
 

@@ -1,5 +1,5 @@
-#ifndef MY_STRING_H
-#define MY_STRING_H
+#ifndef __MY_STRING_H__
+#define __MY_STRING_H__
 
 #include"array_list.h"
 

@@ -1,5 +1,5 @@
-#ifndef _RB_TREE_H
-#define _RB_TREE_H
+#ifndef __RB_TREE_H__
+#define __RB_TREE_H__
 
 #include "common.h"
 

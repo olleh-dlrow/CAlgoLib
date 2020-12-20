@@ -1,5 +1,5 @@
-#ifndef _ARRAY_LIST_H
-#define _ARRAY_LIST_H
+#ifndef __ARRAY_LIST_H__
+#define __ARRAY_LIST_H__
 
 #include "common.h"
 

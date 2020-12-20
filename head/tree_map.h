@@ -1,5 +1,5 @@
-#ifndef _TREE_MAP_H
-#define _TREE_MAP_H
+#ifndef __TREE_MAP_H__
+#define __TREE_MAP_H__
 
 #include "rb_tree.h"
 #include "array_list.h"
