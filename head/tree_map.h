@@ -12,7 +12,7 @@ typedef struct tree_map
     size_t pair_size;
     size_t length;
     //get key and compare key
-    key_type *(*get_key)(pair_type *piar);
+    key_type *(*get_key)(pair_type *pair);
     int (*cmp_func)(void *a, void *b);
     //get value
     value_type *(*get_value)(pair_type *pair);
